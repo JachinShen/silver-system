@@ -1,0 +1,5 @@
+result_*
+models
+__pycache__
+*.pyc
+dataset
