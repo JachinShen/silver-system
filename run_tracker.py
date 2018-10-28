@@ -1,10 +1,16 @@
+from DaSiamRPN.net import SiamRPNBIG
+from DaSiamRPN.utils import get_axis_aligned_bbox, cxy_wh_2_rect
+from DaSiamRPN.run_SiamRPN import SiamRPN_init, SiamRPN_track
 import cv2 as cv
 import matplotlib.pyplot as plt
 import json
 import random
+import torch
+import numpy as np
 
 from gen_seq import gen_seq
 # from DAT.tracking.run_DAT import run_mdnet
+
 
 class Tracker:
     def __init__(self):
@@ -19,9 +25,36 @@ class Tracker:
 
     def update(self, image):
         self.image = image
-        self.bbox[0] += random.random()
-        self.bbox[3] += random.random()
         return self.bbox
+
+
+class DaSiamRPN():
+    def __init__(self):
+        pass
+
+    def load_model(self, net_file):
+        self.net = SiamRPNBIG()
+        self.net.load_state_dict(torch.load(net_file, map_location="cpu"))
+        self.net.eval().cpu()
+
+        for i in range(10):
+            self.net.temple(torch.autograd.Variable(
+                torch.FloatTensor(1, 3, 127, 127)).cpu())
+            self.net(torch.autograd.Variable(
+                torch.FloatTensor(1, 3, 255, 255)).cpu())
+
+    def init_bbox(self, image, bbox):
+        target_pos = np.array(bbox[0:2])
+        target_size = np.array(bbox[2:4])
+        self.state = SiamRPN_init(image, target_pos, target_size, self.net)
+
+    def update(self, image):
+        self.state = SiamRPN_track(self.state, image)
+        target_pos = self.state['target_pos']
+        target_size = self.state['target_sz']
+        bbox = [target_pos[0], target_pos[1], target_size[0], target_size[1]]
+        return bbox
+
 
 def draw_rect(image, rect, color):
     x = int(rect[0])
@@ -42,16 +75,16 @@ def draw_rect(image, rect, color):
 
 if __name__ == "__main__":
     # Generate sequence config
-    img_list, init_bbox, gt = gen_seq( seq='Football')
+    img_list, init_bbox, gt = gen_seq(seq='Football')
 
     # Tracker
-    tracker = Tracker()
+    tracker = DaSiamRPN()
+    tracker.load_model("./DaSiamRPN/SiamRPNBIG.model")
 
     # init
     image_init = cv.imread(img_list[0])
     image_init = cv.cvtColor(image_init, cv.COLOR_BGR2RGB)
     tracker.init_bbox(image_init, gt[0])
-
 
     # Run tracker
     for img_file, ground_truth in zip(img_list, gt):
