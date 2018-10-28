@@ -1,5 +1,4 @@
 from DaSiamRPN.net import SiamRPNBIG
-from DaSiamRPN.utils import get_axis_aligned_bbox, cxy_wh_2_rect
 from DaSiamRPN.run_SiamRPN import SiamRPN_init, SiamRPN_track
 import cv2 as cv
 import matplotlib.pyplot as plt
