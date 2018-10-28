@@ -59,8 +59,8 @@ class TrackerConfig(object):
 def tracker_eval(net, x_crop, target_pos, target_sz, window, scale_z, p):
     delta, score = net(x_crop)
 
-    delta = delta.permute(1, 2, 3, 0).contiguous().view(4, -1).data.cuda().numpy()
-    score = F.softmax(score.permute(1, 2, 3, 0).contiguous().view(2, -1), dim=0).data[1, :].cuda().numpy()
+    delta = delta.permute(1, 2, 3, 0).contiguous().view(4, -1).data.cpu().numpy()
+    score = F.softmax(score.permute(1, 2, 3, 0).contiguous().view(2, -1), dim=0).data[1, :].cpu().numpy()
 
     delta[0, :] = delta[0, :] * p.anchor[:, 2] + p.anchor[:, 0]
     delta[1, :] = delta[1, :] * p.anchor[:, 3] + p.anchor[:, 1]
