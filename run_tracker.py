@@ -68,7 +68,7 @@ def draw_rect(image, rect, color):
     elif color == "blue":
         color = (0, 0, 255)
 
-    cv.rectangle(image, (x, y), (x+width, y+height), color)
+    cv.rectangle(image, (x, y), (x+width, y+height), color, 3)
     return image
 
 
