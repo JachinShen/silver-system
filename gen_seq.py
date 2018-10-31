@@ -3,18 +3,19 @@ import json
 import numpy as np
 
 
-def gen_seq(seq):
+def gen_seq(img_dir, gt_path):
+    seq = "233"
 
     if seq != '':
         # generate config from a sequence name
 
-        seq_home = './dataset/OTB'
+        # seq_home = './dataset/OTB'
         # save_home = './result_fig_labgpu_test'
         # result_home = './result_labgpu_test'
 
         seq_name = seq
-        img_dir = os.path.join(seq_home, seq_name, 'img')
-        gt_path = os.path.join(seq_home, seq_name, 'groundtruth_rect.txt')
+        # img_dir = os.path.join(seq_home, seq_name, 'img')
+        # gt_path = os.path.join(seq_home, seq_name, 'groundtruth_rect.txt')
 
         img_list = os.listdir(img_dir)
         img_list.sort()

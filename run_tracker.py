@@ -75,7 +75,7 @@ def draw_rect(image, rect, color):
 
 if __name__ == "__main__":
     # Generate sequence config
-    img_list, init_bbox, gt = gen_seq(seq='Football')
+    img_list, init_bbox, gt = gen_seq("./dataset/OTB/Football/img", "./dataset/OTB/Football/groundtruth_rect.txt")
 
     # Tracker
     tracker = DaSiamRPN()
