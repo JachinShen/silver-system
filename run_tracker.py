@@ -1,5 +1,6 @@
 from DaSiamRPN.net import SiamRPNBIG
 from DaSiamRPN.run_SiamRPN import SiamRPN_init, SiamRPN_track
+from modules.utils import overlap_ratio
 import cv2 as cv
 import matplotlib.pyplot as plt
 import json
@@ -84,9 +85,10 @@ if __name__ == "__main__":
     image_init = cv.imread(img_list[0])
     image_init = cv.cvtColor(image_init, cv.COLOR_BGR2RGB)
     tracker.init_bbox(image_init, gt[0])
+    overlap_ratio_list = []
 
     # Run tracker
-    for img_file, ground_truth in zip(img_list, gt):
+    for img_file, ground_truth in zip(img_list[1:4], gt[1:4]):
         image = cv.imread(img_file)
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
@@ -96,7 +98,10 @@ if __name__ == "__main__":
 
         # update
         result_bbox = tracker.update(image)
-        print(result_bbox)
+        result_bbox = np.array(result_bbox)
+        overlap = overlap_ratio(result_bbox, ground_truth)
+        overlap_ratio_list.append(overlap)
+        print("Overlap{}".format(overlap))
 
         image_draw = draw_rect(image_draw, result_bbox, "blue")
 
@@ -106,6 +111,7 @@ if __name__ == "__main__":
         # plt.imshow(image)
         # plt.show()
 
+    plt.plot(overlap_ratio_list)
     # Save result
     # res = {}
     # res['res'] = result_bb.round().tolist()
