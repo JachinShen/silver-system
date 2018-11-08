@@ -113,6 +113,7 @@ def SiamRPN_init(im, target_pos, target_sz, net):
     state['im_h'] = im.shape[0]
     state['im_w'] = im.shape[1]
     state['kalman'] = SimpleKalman2D(target_pos[0], target_pos[1])
+    state['ctr'] = 1
 
     if ((target_sz[0] * target_sz[1]) / float(state['im_h'] * state['im_w'])) < 0.004:
         p.instance_size = 287  # small object big search region
@@ -157,13 +158,15 @@ def SiamRPN_track(state, im):
     target_pos = state['target_pos']
     target_sz = state['target_sz']
     kalman = state['kalman']
-    predict_pos = kalman.predict()
-    trade = 0.1
-    print("target pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
-    print("predict pos x: {}, y:{}".format(predict_pos[0], predict_pos[1]))
-    target_pos[0] = (int)(target_pos[0]*(1.0-p) + predict_pos[0]*p)
-    target_pos[1] = (int)(target_pos[1]*(1.0-p) + predict_pos[1]*p)
-    print("final pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
+    state['ctr'] += 1
+    if state['ctr'] > 10:
+        predict_pos = kalman.predict()
+        trade = 0.1
+        print("target pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
+        print("predict pos x: {}, y:{}".format(predict_pos[0], predict_pos[1]))
+        target_pos[0] = (int)(target_pos[0]*(1.0-p) + predict_pos[0]*p)
+        target_pos[1] = (int)(target_pos[1]*(1.0-p) + predict_pos[1]*p)
+        print("final pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
 
     wc_z = target_sz[1] + p.context_amount * sum(target_sz)
     hc_z = target_sz[0] + p.context_amount * sum(target_sz)
