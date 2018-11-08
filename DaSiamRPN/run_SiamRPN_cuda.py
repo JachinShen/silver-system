@@ -159,8 +159,8 @@ def SiamRPN_track(state, im):
     target_sz = state['target_sz']
     kalman = state['kalman']
     state['ctr'] += 1
+    predict_pos = kalman.predict()
     if state['ctr'] > 50:
-        predict_pos = kalman.predict()
         trade = 0.5
         print("target pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
         print("predict pos x: {}, y:{}".format(predict_pos[0], predict_pos[1]))
