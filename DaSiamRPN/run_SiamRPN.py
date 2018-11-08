@@ -6,7 +6,7 @@
 import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
-from kalman import SimpleKalman2D
+from DaSiamRPN.kalman import SimpleKalman2D
 
 
 from DaSiamRPN.utils import get_subwindow_tracking
