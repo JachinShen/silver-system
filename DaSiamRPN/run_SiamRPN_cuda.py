@@ -164,8 +164,8 @@ def SiamRPN_track(state, im):
         trade = 0.1
         print("target pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
         print("predict pos x: {}, y:{}".format(predict_pos[0], predict_pos[1]))
-        target_pos[0] = (int)(target_pos[0]*(1.0-p) + predict_pos[0]*p)
-        target_pos[1] = (int)(target_pos[1]*(1.0-p) + predict_pos[1]*p)
+        target_pos[0] = (int)(target_pos[0]*(1.0-trade) + predict_pos[0]*trade)
+        target_pos[1] = (int)(target_pos[1]*(1.0-trade) + predict_pos[1]*trade)
         print("final pos x: {}, y:{}".format(target_pos[0], target_pos[1]))
 
     wc_z = target_sz[1] + p.context_amount * sum(target_sz)
