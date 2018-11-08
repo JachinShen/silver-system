@@ -6,6 +6,7 @@
 import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
+from kalman import SimpleKalman2D
 
 
 from DaSiamRPN.utils import get_subwindow_tracking
@@ -111,6 +112,7 @@ def SiamRPN_init(im, target_pos, target_sz, net):
     p = TrackerConfig()
     state['im_h'] = im.shape[0]
     state['im_w'] = im.shape[1]
+    state['kalman'] = SimpleKalman2D(target_pos[0], target_pos[1])
 
     if ((target_sz[0] * target_sz[1]) / float(state['im_h'] * state['im_w'])) < 0.004:
         p.instance_size = 287  # small object big search region
@@ -154,6 +156,10 @@ def SiamRPN_track(state, im):
     window = state['window']
     target_pos = state['target_pos']
     target_sz = state['target_sz']
+    kalman = state['kalman']
+    predict_pos = kalman.predict()
+    target_pos[0] = (target_pos[0] + predict_pos[0]) / 2
+    target_pos[1] = (target_pos[1] + predict_pos[1]) / 2
 
     wc_z = target_sz[1] + p.context_amount * sum(target_sz)
     hc_z = target_sz[0] + p.context_amount * sum(target_sz)
@@ -171,7 +177,9 @@ def SiamRPN_track(state, im):
     target_pos[1] = max(0, min(state['im_h'], target_pos[1]))
     target_sz[0] = max(10, min(state['im_w'], target_sz[0]))
     target_sz[1] = max(10, min(state['im_h'], target_sz[1]))
+    kalman.correct(target_pos[0], target_pos[1])
     state['target_pos'] = target_pos
     state['target_sz'] = target_sz
     state['score'] = score
+    state['kalman'] = kalman
     return state
